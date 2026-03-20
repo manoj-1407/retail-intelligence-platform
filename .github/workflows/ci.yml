@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB:       retail_db
+          POSTGRES_USER:     postgres
+          POSTGRES_PASSWORD: ci_password
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd="pg_isready -U postgres -d retail_db"
+          --health-interval=10s --health-timeout=5s --health-retries=5
+
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s --health-timeout=5s --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Apply schema
+        env:
+          PGPASSWORD: ci_password
+        run: |
+          psql -h localhost -U postgres -d retail_db \
+            -f database/migrations/schema.sql 2>/dev/null || true
+
+      - name: Run tests
+        env:
+          DB_HOST:          localhost
+          DB_PORT:          5432
+          DB_NAME:          retail_db
+          DB_USER:          postgres
+          DB_PASS:          ci_password
+          REDIS_HOST:       localhost
+          REDIS_PORT:       6379
+          JWT_SECRET:       ci-secret-key-must-be-32-chars-minimum-ok
+          ADMIN_PASSWORD:   test-admin-ci
+          VIEWER_PASSWORD:  test-viewer-ci
+        run: python3 -m pytest --tb=short -q
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-results
+          path: .pytest_cache/

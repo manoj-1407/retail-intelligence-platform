@@ -1,0 +1,407 @@
+[
+  {
+    "row": {
+      "shipment_ref": "SHP-00018",
+      "sku": "CLTH-002",
+      "store_code": "WMT-IL-001",
+      "quantity": "-2",
+      "priority": "low",
+      "status": "delivered",
+      "shipped_at": "2026-03-18T14:49:12.375890",
+      "delivered_at": "2026-03-23T14:49:12.375890"
+    },
+    "errors": [
+      "non-positive quantity: -2"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00030",
+      "sku": "INVALID-SKU",
+      "store_code": "WMT-WA-001",
+      "quantity": "145",
+      "priority": "high",
+      "status": "in_transit",
+      "shipped_at": "2026-03-02T14:49:12.375890",
+      "delivered_at": ""
+    },
+    "errors": [
+      "unknown sku: INVALID-SKU"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00063",
+      "sku": "ELEC-002",
+      "store_code": "WMT-TX-002",
+      "quantity": "-3",
+      "priority": "normal",
+      "status": "delivered",
+      "shipped_at": "2026-03-02T14:49:12.375890",
+      "delivered_at": "2026-03-05T14:49:12.375890"
+    },
+    "errors": [
+      "non-positive quantity: -3"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00071",
+      "sku": "INVALID-SKU",
+      "store_code": "WMT-AZ-001",
+      "quantity": "6",
+      "priority": "normal",
+      "status": "in_transit",
+      "shipped_at": "2026-03-17T14:49:12.375890",
+      "delivered_at": ""
+    },
+    "errors": [
+      "unknown sku: INVALID-SKU"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00073",
+      "sku": "ELEC-002",
+      "store_code": "WMT-NY-001",
+      "quantity": "-2",
+      "priority": "high",
+      "status": "in_transit",
+      "shipped_at": "2026-03-02T14:49:12.375890",
+      "delivered_at": ""
+    },
+    "errors": [
+      "non-positive quantity: -2"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00110",
+      "sku": "INVALID-SKU",
+      "store_code": "WMT-NY-001",
+      "quantity": "32",
+      "priority": "low",
+      "status": "delivered",
+      "shipped_at": "2026-03-02T14:49:12.375890",
+      "delivered_at": "2026-03-03T14:49:12.375890"
+    },
+    "errors": [
+      "unknown sku: INVALID-SKU"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00154",
+      "sku": "HOME-001",
+      "store_code": "WMT-WA-001",
+      "quantity": "-5",
+      "priority": "normal",
+      "status": "in_transit",
+      "shipped_at": "2026-03-05T14:49:12.375890",
+      "delivered_at": ""
+    },
+    "errors": [
+      "non-positive quantity: -5"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00158",
+      "sku": "HOME-002",
+      "store_code": "WMT-AZ-001",
+      "quantity": "-4",
+      "priority": "normal",
+      "status": "in_transit",
+      "shipped_at": "2026-02-16T14:49:12.375890",
+      "delivered_at": ""
+    },
+    "errors": [
+      "non-positive quantity: -4"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00199",
+      "sku": "GROC-001",
+      "store_code": "WMT-CA-002",
+      "quantity": "-3",
+      "priority": "high",
+      "status": "delivered",
+      "shipped_at": "2026-02-25T14:49:12.375890",
+      "delivered_at": "2026-03-01T14:49:12.375890"
+    },
+    "errors": [
+      "non-positive quantity: -3"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00200",
+      "sku": "GROC-001",
+      "store_code": "WMT-NY-001",
+      "quantity": "-4",
+      "priority": "critical",
+      "status": "pending",
+      "shipped_at": "2026-02-22T14:49:12.375890",
+      "delivered_at": ""
+    },
+    "errors": [
+      "non-positive quantity: -4"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00203",
+      "sku": "GROC-002",
+      "store_code": "WMT-IL-001",
+      "quantity": "-2",
+      "priority": "normal",
+      "status": "pending",
+      "shipped_at": "2026-02-20T14:49:12.375890",
+      "delivered_at": ""
+    },
+    "errors": [
+      "non-positive quantity: -2"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00221",
+      "sku": "INVALID-SKU",
+      "store_code": "WMT-GA-001",
+      "quantity": "74",
+      "priority": "normal",
+      "status": "delivered",
+      "shipped_at": "2026-03-16T14:49:12.375890",
+      "delivered_at": "2026-03-17T14:49:12.375890"
+    },
+    "errors": [
+      "unknown sku: INVALID-SKU"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00245",
+      "sku": "INVALID-SKU",
+      "store_code": "WMT-CA-002",
+      "quantity": "133",
+      "priority": "normal",
+      "status": "delivered",
+      "shipped_at": "2026-03-17T14:49:12.375890",
+      "delivered_at": "2026-03-19T14:49:12.375890"
+    },
+    "errors": [
+      "unknown sku: INVALID-SKU"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00249",
+      "sku": "INVALID-SKU",
+      "store_code": "WMT-CA-002",
+      "quantity": "198",
+      "priority": "normal",
+      "status": "delivered",
+      "shipped_at": "2026-02-16T14:49:12.375890",
+      "delivered_at": "2026-02-21T14:49:12.375890"
+    },
+    "errors": [
+      "unknown sku: INVALID-SKU"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00321",
+      "sku": "TOYS-001",
+      "store_code": "WMT-TX-001",
+      "quantity": "0",
+      "priority": "normal",
+      "status": "pending",
+      "shipped_at": "2026-03-17T14:49:12.375890",
+      "delivered_at": ""
+    },
+    "errors": [
+      "non-positive quantity: 0"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00324",
+      "sku": "INVALID-SKU",
+      "store_code": "WMT-IL-001",
+      "quantity": "25",
+      "priority": "normal",
+      "status": "pending",
+      "shipped_at": "2026-03-01T14:49:12.375890",
+      "delivered_at": ""
+    },
+    "errors": [
+      "unknown sku: INVALID-SKU"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00329",
+      "sku": "ELEC-002",
+      "store_code": "WMT-CA-002",
+      "quantity": "-3",
+      "priority": "normal",
+      "status": "in_transit",
+      "shipped_at": "2026-02-28T14:49:12.375890",
+      "delivered_at": ""
+    },
+    "errors": [
+      "non-positive quantity: -3"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00330",
+      "sku": "INVALID-SKU",
+      "store_code": "WMT-CA-002",
+      "quantity": "10",
+      "priority": "normal",
+      "status": "delivered",
+      "shipped_at": "2026-02-28T14:49:12.375890",
+      "delivered_at": "2026-03-03T14:49:12.375890"
+    },
+    "errors": [
+      "unknown sku: INVALID-SKU"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00333",
+      "sku": "GROC-002",
+      "store_code": "WMT-CA-002",
+      "quantity": "0",
+      "priority": "low",
+      "status": "in_transit",
+      "shipped_at": "2026-03-03T14:49:12.375890",
+      "delivered_at": ""
+    },
+    "errors": [
+      "non-positive quantity: 0"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00368",
+      "sku": "INVALID-SKU",
+      "store_code": "WMT-AZ-001",
+      "quantity": "122",
+      "priority": "high",
+      "status": "in_transit",
+      "shipped_at": "2026-02-26T14:49:12.375890",
+      "delivered_at": ""
+    },
+    "errors": [
+      "unknown sku: INVALID-SKU"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00379",
+      "sku": "INVALID-SKU",
+      "store_code": "WMT-FL-001",
+      "quantity": "21",
+      "priority": "low",
+      "status": "delivered",
+      "shipped_at": "2026-03-09T14:49:12.375890",
+      "delivered_at": "2026-03-12T14:49:12.375890"
+    },
+    "errors": [
+      "unknown sku: INVALID-SKU"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00384",
+      "sku": "HOME-001",
+      "store_code": "WMT-CA-002",
+      "quantity": "-3",
+      "priority": "low",
+      "status": "delivered",
+      "shipped_at": "2026-02-17T14:49:12.375890",
+      "delivered_at": "2026-02-22T14:49:12.375890"
+    },
+    "errors": [
+      "non-positive quantity: -3"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00416",
+      "sku": "INVALID-SKU",
+      "store_code": "WMT-CA-002",
+      "quantity": "89",
+      "priority": "high",
+      "status": "delivered",
+      "shipped_at": "2026-03-17T14:49:12.375890",
+      "delivered_at": "2026-03-21T14:49:12.375890"
+    },
+    "errors": [
+      "unknown sku: INVALID-SKU"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00465",
+      "sku": "INVALID-SKU",
+      "store_code": "WMT-TX-002",
+      "quantity": "63",
+      "priority": "normal",
+      "status": "delivered",
+      "shipped_at": "2026-02-18T14:49:12.375890",
+      "delivered_at": "2026-02-23T14:49:12.375890"
+    },
+    "errors": [
+      "unknown sku: INVALID-SKU"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00471",
+      "sku": "GROC-002",
+      "store_code": "WMT-CA-001",
+      "quantity": "0",
+      "priority": "normal",
+      "status": "in_transit",
+      "shipped_at": "2026-03-12T14:49:12.375890",
+      "delivered_at": ""
+    },
+    "errors": [
+      "non-positive quantity: 0"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00473",
+      "sku": "ELEC-001",
+      "store_code": "WMT-IL-001",
+      "quantity": "0",
+      "priority": "low",
+      "status": "in_transit",
+      "shipped_at": "2026-02-22T14:49:12.375890",
+      "delivered_at": ""
+    },
+    "errors": [
+      "non-positive quantity: 0"
+    ]
+  },
+  {
+    "row": {
+      "shipment_ref": "SHP-00479",
+      "sku": "INVALID-SKU",
+      "store_code": "WMT-WA-001",
+      "quantity": "144",
+      "priority": "normal",
+      "status": "in_transit",
+      "shipped_at": "2026-02-22T14:49:12.375890",
+      "delivered_at": ""
+    },
+    "errors": [
+      "unknown sku: INVALID-SKU"
+    ]
+  }
+]
