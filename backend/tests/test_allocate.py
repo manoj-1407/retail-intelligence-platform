@@ -28,13 +28,13 @@ def _current_qty(client, headers, product_id, store_id):
 
 @pytest.fixture(scope="module")
 def inv_record(client, auth_header):
-    """First live inventory row — skips if DB unavailable or empty."""
+    """Use seeded TEST-001 inventory row."""
     r = client.get("/inventory?page=1&page_size=1", headers=auth_header)
     if r.status_code != 200:
         pytest.skip("DB unavailable")
     rows = r.json().get("data", [])
     if not rows:
-        pytest.skip("No inventory seed data — populate the DB first")
+        pytest.skip("DB empty — run schema.sql to seed")
     row = rows[0]
     return row["product_id"], row["store_id"], row["quantity"]
 

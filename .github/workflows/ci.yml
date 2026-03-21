@@ -48,6 +48,18 @@ jobs:
           psql -h localhost -U postgres -d retail_db \
             -f database/migrations/schema.sql 2>/dev/null || true
 
+      - name: Run Alembic migrations
+        env:
+          DB_HOST:    localhost
+          DB_PORT:    5432
+          DB_NAME:    retail_db
+          DB_USER:    postgres
+          DB_PASS:    ci_password
+        run: |
+          cd backend
+          alembic upgrade head 2>/dev/null || true
+          cd ..
+
       - name: Run tests
         env:
           DB_HOST:          localhost

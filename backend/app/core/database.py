@@ -52,3 +52,17 @@ def execute_query(sql: str, params=None, fetch: bool = True):
         raise
     finally:
         release_connection(conn)
+
+
+def execute_write(query: str, params: dict | None = None) -> None:
+    """Execute an INSERT/UPDATE/DELETE query."""
+    conn = get_connection()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(query, params or {})
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()

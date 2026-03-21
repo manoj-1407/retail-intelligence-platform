@@ -1,370 +1,122 @@
---
--- PostgreSQL database dump
---
+-- ============================================================
+-- Retail Intelligence Platform — Database Schema
+-- Generated from Alembic migration 0001_initial_schema
+-- ============================================================
 
-\restrict WySS3RsY3hOyrTTvMkgaawwJR4RBBnrCXdzsGHpg8Ic70QWOoUeqhnFeoNu6oH1
+-- Extensions
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Dumped from database version 16.13 (Ubuntu 16.13-0ubuntu0.24.04.1)
--- Dumped by pg_dump version 16.13 (Ubuntu 16.13-0ubuntu0.24.04.1)
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
-SET default_tablespace = '';
-
-SET default_table_access_method = heap;
-
---
--- Name: inventory; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.inventory (
-    id integer NOT NULL,
-    product_id integer NOT NULL,
-    store_id integer NOT NULL,
-    quantity integer DEFAULT 0 NOT NULL,
-    reorder_point integer DEFAULT 10 NOT NULL,
-    updated_at timestamp with time zone DEFAULT now(),
-    CONSTRAINT inventory_quantity_check CHECK ((quantity >= 0))
+-- ── Stores ────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS stores (
+    id          SERIAL PRIMARY KEY,
+    name        VARCHAR(255) NOT NULL UNIQUE,
+    location    VARCHAR(255),
+    created_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE INDEX IF NOT EXISTS idx_stores_name ON stores(name);
 
-ALTER TABLE public.inventory OWNER TO postgres;
-
---
--- Name: inventory_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.inventory_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.inventory_id_seq OWNER TO postgres;
-
---
--- Name: inventory_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.inventory_id_seq OWNED BY public.inventory.id;
-
-
---
--- Name: products; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.products (
-    id integer NOT NULL,
-    sku character varying(50) NOT NULL,
-    name character varying(255) NOT NULL,
-    category character varying(100) NOT NULL,
-    unit_cost numeric(10,2) NOT NULL,
-    unit_price numeric(10,2) NOT NULL,
-    created_at timestamp with time zone DEFAULT now(),
-    CONSTRAINT products_check CHECK ((unit_price > unit_cost)),
-    CONSTRAINT products_unit_cost_check CHECK ((unit_cost > (0)::numeric))
+-- ── Products ──────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS products (
+    id          SERIAL PRIMARY KEY,
+    name        VARCHAR(255) NOT NULL,
+    category    VARCHAR(100) NOT NULL,
+    price       NUMERIC(10, 2) NOT NULL CHECK (price >= 0),
+    cost        NUMERIC(10, 2) NOT NULL CHECK (cost >= 0),
+    sku         VARCHAR(100) UNIQUE,
+    created_at  TIMESTAMPTZ DEFAULT NOW(),
+    updated_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
+CREATE INDEX IF NOT EXISTS idx_products_sku      ON products(sku);
+CREATE INDEX IF NOT EXISTS idx_products_name     ON products(name);
 
-ALTER TABLE public.products OWNER TO postgres;
-
---
--- Name: products_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.products_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.products_id_seq OWNER TO postgres;
-
---
--- Name: products_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.products_id_seq OWNED BY public.products.id;
-
-
---
--- Name: shipments; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.shipments (
-    id integer NOT NULL,
-    product_id integer NOT NULL,
-    store_id integer NOT NULL,
-    quantity integer NOT NULL,
-    status character varying(20) DEFAULT 'pending'::character varying NOT NULL,
-    shipped_at timestamp with time zone,
-    delivered_at timestamp with time zone,
-    created_at timestamp with time zone DEFAULT now(),
-    CONSTRAINT shipments_quantity_check CHECK ((quantity > 0)),
-    CONSTRAINT shipments_status_check CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'in_transit'::character varying, 'delivered'::character varying, 'cancelled'::character varying])::text[])))
+-- ── Inventory ─────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS inventory (
+    id            SERIAL PRIMARY KEY,
+    product_id    INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    store_id      INTEGER NOT NULL REFERENCES stores(id)   ON DELETE CASCADE,
+    quantity      INTEGER NOT NULL DEFAULT 0 CHECK (quantity >= 0),
+    reorder_point INTEGER NOT NULL DEFAULT 10,
+    updated_at    TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE (product_id, store_id)
 );
 
+CREATE INDEX IF NOT EXISTS idx_inventory_product  ON inventory(product_id);
+CREATE INDEX IF NOT EXISTS idx_inventory_store    ON inventory(store_id);
+CREATE INDEX IF NOT EXISTS idx_inventory_qty      ON inventory(quantity);
+CREATE INDEX IF NOT EXISTS idx_inventory_low_stock
+    ON inventory(quantity) WHERE quantity <= reorder_point;
 
-ALTER TABLE public.shipments OWNER TO postgres;
-
---
--- Name: shipments_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.shipments_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.shipments_id_seq OWNER TO postgres;
-
---
--- Name: shipments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.shipments_id_seq OWNED BY public.shipments.id;
-
-
---
--- Name: stores; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.stores (
-    id integer NOT NULL,
-    store_code character varying(20) NOT NULL,
-    name character varying(255) NOT NULL,
-    region character varying(100) NOT NULL,
-    capacity integer NOT NULL,
-    created_at timestamp with time zone DEFAULT now(),
-    CONSTRAINT stores_capacity_check CHECK ((capacity > 0))
+-- ── Shipments ─────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS shipments (
+    id          SERIAL PRIMARY KEY,
+    product_id  INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    store_id    INTEGER NOT NULL REFERENCES stores(id)   ON DELETE CASCADE,
+    quantity    INTEGER NOT NULL CHECK (quantity > 0),
+    status      VARCHAR(50) NOT NULL DEFAULT 'pending'
+                    CHECK (status IN ('pending', 'in_transit', 'delivered', 'cancelled')),
+    created_at  TIMESTAMPTZ DEFAULT NOW(),
+    updated_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
-
-ALTER TABLE public.stores OWNER TO postgres;
-
---
--- Name: stores_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.stores_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.stores_id_seq OWNER TO postgres;
-
---
--- Name: stores_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.stores_id_seq OWNED BY public.stores.id;
-
-
---
--- Name: inventory id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.inventory ALTER COLUMN id SET DEFAULT nextval('public.inventory_id_seq'::regclass);
-
-
---
--- Name: products id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.products ALTER COLUMN id SET DEFAULT nextval('public.products_id_seq'::regclass);
-
-
---
--- Name: shipments id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.shipments ALTER COLUMN id SET DEFAULT nextval('public.shipments_id_seq'::regclass);
-
-
---
--- Name: stores id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.stores ALTER COLUMN id SET DEFAULT nextval('public.stores_id_seq'::regclass);
-
-
---
--- Name: inventory inventory_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.inventory
-    ADD CONSTRAINT inventory_pkey PRIMARY KEY (id);
-
-
---
--- Name: inventory inventory_product_id_store_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.inventory
-    ADD CONSTRAINT inventory_product_id_store_id_key UNIQUE (product_id, store_id);
-
-
---
--- Name: products products_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.products
-    ADD CONSTRAINT products_pkey PRIMARY KEY (id);
-
-
---
--- Name: products products_sku_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.products
-    ADD CONSTRAINT products_sku_key UNIQUE (sku);
-
-
---
--- Name: shipments shipments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.shipments
-    ADD CONSTRAINT shipments_pkey PRIMARY KEY (id);
-
-
---
--- Name: stores stores_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.stores
-    ADD CONSTRAINT stores_pkey PRIMARY KEY (id);
-
-
---
--- Name: stores stores_store_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.stores
-    ADD CONSTRAINT stores_store_code_key UNIQUE (store_code);
-
-
---
--- Name: idx_inventory_product; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX idx_inventory_product ON public.inventory USING btree (product_id);
-
-
---
--- Name: idx_inventory_qty; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX idx_inventory_qty ON public.inventory USING btree (quantity);
-
-
---
--- Name: idx_inventory_store; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX idx_inventory_store ON public.inventory USING btree (store_id);
-
-
---
--- Name: idx_products_category; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX idx_products_category ON public.products USING btree (category);
-
-
---
--- Name: idx_shipments_created; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX idx_shipments_created ON public.shipments USING btree (created_at DESC);
-
-
---
--- Name: idx_shipments_product; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX idx_shipments_product ON public.shipments USING btree (product_id);
-
-
---
--- Name: idx_shipments_status; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX idx_shipments_status ON public.shipments USING btree (status);
-
-
---
--- Name: idx_shipments_store; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX idx_shipments_store ON public.shipments USING btree (store_id);
-
-
---
--- Name: idx_stores_region; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX idx_stores_region ON public.stores USING btree (region);
-
-
---
--- Name: inventory inventory_product_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.inventory
-    ADD CONSTRAINT inventory_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id) ON DELETE CASCADE;
-
-
---
--- Name: inventory inventory_store_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.inventory
-    ADD CONSTRAINT inventory_store_id_fkey FOREIGN KEY (store_id) REFERENCES public.stores(id) ON DELETE CASCADE;
-
-
---
--- Name: shipments shipments_product_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.shipments
-    ADD CONSTRAINT shipments_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id);
-
-
---
--- Name: shipments shipments_store_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.shipments
-    ADD CONSTRAINT shipments_store_id_fkey FOREIGN KEY (store_id) REFERENCES public.stores(id);
-
-
---
--- PostgreSQL database dump complete
---
-
-\unrestrict WySS3RsY3hOyrTTvMkgaawwJR4RBBnrCXdzsGHpg8Ic70QWOoUeqhnFeoNu6oH1
-
+CREATE INDEX IF NOT EXISTS idx_shipments_status     ON shipments(status);
+CREATE INDEX IF NOT EXISTS idx_shipments_product    ON shipments(product_id);
+CREATE INDEX IF NOT EXISTS idx_shipments_store      ON shipments(store_id);
+CREATE INDEX IF NOT EXISTS idx_shipments_created_at ON shipments(created_at DESC);
+
+-- ── Seed data (10 stores, 10 products, 100 inventory rows) ──────────
+INSERT INTO stores (name, location) VALUES
+    ('Store Alpha',   'Mumbai'),
+    ('Store Beta',    'Delhi'),
+    ('Store Gamma',   'Bangalore'),
+    ('Store Delta',   'Chennai'),
+    ('Store Epsilon', 'Hyderabad'),
+    ('Store Zeta',    'Kolkata'),
+    ('Store Eta',     'Pune'),
+    ('Store Theta',   'Ahmedabad'),
+    ('Store Iota',    'Jaipur'),
+    ('Store Kappa',   'Surat')
+ON CONFLICT (name) DO NOTHING;
+
+INSERT INTO products (name, category, price, cost, sku) VALUES
+    ('Laptop Pro 15',      'Electronics',  89999.00, 65000.00, 'ELEC-001'),
+    ('Wireless Mouse',     'Electronics',   1299.00,   600.00, 'ELEC-002'),
+    ('USB-C Hub',          'Electronics',   2499.00,  1100.00, 'ELEC-003'),
+    ('Office Chair',       'Furniture',    12999.00,  7000.00, 'FURN-001'),
+    ('Standing Desk',      'Furniture',    24999.00, 14000.00, 'FURN-002'),
+    ('Notebook A5',        'Stationery',     199.00,    60.00, 'STAT-001'),
+    ('Ballpoint Pens 10x', 'Stationery',     149.00,    40.00, 'STAT-002'),
+    ('Water Bottle 1L',    'Kitchen',        599.00,   180.00, 'KITCH-001'),
+    ('Coffee Mug',         'Kitchen',        399.00,   100.00, 'KITCH-002'),
+    ('Desk Lamp LED',      'Electronics',   1999.00,   800.00, 'ELEC-004')
+ON CONFLICT (sku) DO NOTHING;
+
+-- 100 inventory rows (10 products x 10 stores)
+INSERT INTO inventory (product_id, store_id, quantity, reorder_point)
+SELECT
+    p.id,
+    s.id,
+    -- Vary quantity: some low stock, some normal
+    CASE WHEN (p.id + s.id) % 5 = 0 THEN 3
+         WHEN (p.id + s.id) % 7 = 0 THEN 8
+         ELSE 20 + (p.id * s.id % 80)
+    END,
+    10
+FROM products p CROSS JOIN stores s
+ON CONFLICT (product_id, store_id) DO NOTHING;
+
+-- Sample shipments
+INSERT INTO shipments (product_id, store_id, quantity, status) VALUES
+    (1, 1, 5,  'delivered'),
+    (2, 1, 20, 'in_transit'),
+    (3, 2, 10, 'pending'),
+    (4, 3, 3,  'delivered'),
+    (5, 4, 2,  'cancelled'),
+    (1, 5, 8,  'in_transit'),
+    (6, 6, 50, 'delivered'),
+    (7, 7, 30, 'pending'),
+    (8, 8, 15, 'in_transit'),
+    (9, 9, 12, 'delivered')
+ON CONFLICT DO NOTHING;
