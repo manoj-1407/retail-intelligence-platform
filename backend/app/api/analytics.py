@@ -43,7 +43,7 @@ def summary(request: Request, user: dict = Depends(get_current_user)) -> dict:
         SELECT
             p.category,
             COALESCE(SUM(i.quantity), 0)            AS total_inventory,
-            ROUND(AVG(p.unit_price)::numeric, 2)    AS avg_price
+            ROUND(AVG(p.price)::numeric, 2)    AS avg_price
         FROM products p
         LEFT JOIN inventory i ON i.product_id = p.id
         GROUP BY p.category
